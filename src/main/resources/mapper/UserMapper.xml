@@ -1,0 +1,74 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cykj.mapper.UserMapper">
+
+    <!--Vue登录-->
+    <select id="studentLogin" parameterType="com.cykj.bean.User" resultType="com.cykj.bean.User">
+        select * from t_student WHERE t_student.STUACC = #{stuacc} and t_student.STUIDCARD = #{stuidcard}
+    </select>
+
+    <select id="isexietRegi" parameterType="com.cykj.bean.User" resultType="com.cykj.bean.User">
+        select * from t_student WHERE t_student.STUACC = #{stuacc}
+    </select>
+
+    <!--Vue注册-->
+    <insert id="VueRegister" parameterType="com.cykj.bean.User">
+        insert into t_student (stuacc, stuidcard, stuage)
+        value (#{stuacc}, #{stuidcard}, #{stuage})
+    </insert>
+
+    <!--用户表带分页-->
+    <select id="UserTbFy" parameterType="com.cykj.bean.User" resultType="com.cykj.bean.User">
+        SELECT * FROM t_student LIMIT #{page},#{pagenum}
+    </select>
+
+    <!--学生总数-->
+    <select id="selUserCount" parameterType="int" resultType="Integer">
+        select count(*) from t_student
+    </select>
+
+    <!--一级菜单导航栏-->
+    <select id="MenuFirst" parameterType="com.cykj.bean.Menu" resultType="com.cykj.bean.Menu">
+        select * from t_menu LEFT JOIN t_power ON t_menu.MENUID = t_power.MENUID ORDER BY t_menu.MENUID
+    </select>
+
+    <!--二级菜单导航栏-->
+    <!--    <select id="MenuEr" parameterType="com.cykj.bean.Menu" resultType="com.cykj.bean.Menu">-->
+    <!--        select * from t_menu,t_power WHERE t_menu.MENUID = t_power.MENUID and t_menu.FATHERID != '0' ORDER BY t_menu.MENUID-->
+    <!--    </select>-->
+
+    <select id="selTongJi" parameterType="com.cykj.bean.User" resultType="com.cykj.bean.User">
+        SELECT STUACC AS peos,
+        SUM(CASE WHEN STUSEX = '男' THEN 1 ELSE 0 END) AS nan,
+        SUM(CASE WHEN STUSEX = '女' THEN 1 ELSE 0 END) AS nv,
+        SUM(CASE WHEN STUAGE = '18岁' THEN 1 ELSE 0 END) AS einl,
+        SUM(CASE WHEN STUAGE = '19岁' THEN 1 ELSE 0 END) AS ninl,
+        COUNT(1) AS sums FROM t_student GROUP BY STUACC
+    </select>
+
+    <!--拥有权限渲染rePower-->
+    <select id="havePower" parameterType="com.cykj.bean.Menu" resultType="com.cykj.bean.Menu">
+        SELECT T_MENU.* FROM T_MENU WHERE T_MENU.MENUID IN
+        (SELECT T_MENU.MENUID FROM T_MENU, T_POWER WHERE T_POWER.MENUID = T_MENU.MENUID AND T_POWER.ROLEID = #{ROLEID})
+        OR T_MENU.FATHERID = '0'
+    </select>
+
+    <!--未拥有权限渲染nhavePower-->
+    <select id="nhavePower" parameterType="com.cykj.bean.Menu" resultType="com.cykj.bean.Menu">
+        SELECT T_MENU.* FROM T_MENU WHERE T_MENU.MENUID NOT IN
+        (SELECT T_MENU.MENUID FROM T_MENU, T_POWER WHERE T_POWER.MENUID = T_MENU.MENUID AND T_POWER.ROLEID = #{ROLEID})
+        OR T_MENU.FATHERID = '0'
+    </select>
+
+    <!--查询该权限是否存在isidexit-->
+    <select id="isidexit" parameterType="com.cykj.bean.Menu" resultType="com.cykj.bean.Menu">
+        SELECT * FROM T_POWER WHERE ROLEID = #{ROLEID} AND MENUID = #{MENUID}
+    </select>
+
+    <!--添加权限-->
+    <insert id="insertPower" parameterType="com.cykj.bean.Menu">
+        INSERT INTO T_POWER(ROLEID, MENUID) VALUES(#{ROLEID}, #{MENUID})
+    </insert>
+</mapper>
