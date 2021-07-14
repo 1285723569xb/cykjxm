@@ -181,7 +181,6 @@ public class Test {
     public String nhavePower(int roleid, HttpServletRequest req) {
 //        roleid = Integer.valueOf(req.getParameter("role"));
 //        System.out.println(allID);
-        System.out.println("llllllllllllllll");
         System.out.println(req.getParameter("allID"));
         int[] left = Arrays.stream(req.getParameter("allID").split(",")).mapToInt(Integer::parseInt).toArray();
         for (int i = 0; i < left.length; i++) {
